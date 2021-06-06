@@ -5,6 +5,7 @@ import ListEnumerator from '../presentational/ListEnumerator';
 import { useCookies } from 'react-cookie';
 import AlertComp from '../presentational/AlertComp';
 import SearchForm from '../presentational/SearchForm';
+import Loading from '../presentational/Loading';
 
 const AdminList = () => {
     const history = useHistory();
@@ -17,6 +18,9 @@ const AdminList = () => {
 
     const [ searchStart, setSearchStart ] = useState(false);
 
+    // state for page loading
+    const [ loading, setLoading ] = useState(true);
+
     useEffect(() => {
         // what will replace this block is code to fetch from api
         fetch(`${process.env.REACT_APP_BACKEND_HOST}/fetch-admins`, {
@@ -28,10 +32,11 @@ const AdminList = () => {
         })
         .then(res => res.json())
         .then(data => {
-            setData(data.data.reverse())
+            setData(data.data.reverse());
+            setLoading(false);
         })
         .catch(err => {
-            history('/');
+            history.push('/');
         })
         // console.log(data)
     }, [cookies, history])
@@ -53,30 +58,34 @@ const AdminList = () => {
             jumboShow = {false}
             pageTitle = "Admin List"
         >
-            {(data.length > 0)?
-                <>
-                    <SearchForm 
-                        placeholder = "Search admin's full name, email or BDSP." 
-                        search = {searchData}
-                    />
-
-                
-                    {(searchStart && dataSearchResults.length === 0) &&
-                    
-                        <AlertComp
-                        variant = "danger"
-                            message = "No Admin matches the search query."
-                            dismissable = {false}
-                        />}
-                    <ListEnumerator to = "admin-details" data = {(dataSearchResults.length > 0)? dataSearchResults:  data} from = "adminList" />
-                </>
+            {
+                loading?
+                    <Loading variant = "page" />
                 :
-                <AlertComp
-                    variant = "success"
-                    message = "No folder has been created yet."
-                    dismissable = {false}
-                />
-                
+                    (data.length > 0)?
+                        <>
+                            <SearchForm 
+                                placeholder = "Search admin's full name, email or BDSP." 
+                                search = {searchData}
+                            />
+
+                        
+                            {(searchStart && dataSearchResults.length === 0) &&
+                            
+                                <AlertComp
+                                variant = "danger"
+                                    message = "No Admin matches the search query."
+                                    dismissable = {false}
+                                />}
+                            <ListEnumerator to = "admin-details" data = {(dataSearchResults.length > 0)? dataSearchResults:  data} from = "adminList" />
+                        </>
+                        :
+                        <AlertComp
+                            variant = "success"
+                            message = "No folder has been created yet."
+                            dismissable = {false}
+                        />
+                        
             }
         </Layout>
         

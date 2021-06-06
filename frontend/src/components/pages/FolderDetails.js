@@ -5,6 +5,7 @@ import { useCookies } from 'react-cookie';
 import Layout from '../layout/Layout';
 import UserDetailNormal from '../presentational/UserDetailNormal';
 import UserDetailAccordion from '../presentational/UserDetailAccordion';
+import Loading from '../presentational/Loading';
 
 const FolderDetails = () => {
 
@@ -14,6 +15,9 @@ const FolderDetails = () => {
     
     const [ accessEditable ] = useState((cookies['adminStatus'] === "super") ? true : false);
     const [ user, setUser ] = useState({});
+    // state for loader
+    const [ loading, setLoading ] = useState(true);
+
     const {id} = useParams();
     
     // const fetchFolder = (folderId) => {
@@ -32,6 +36,7 @@ const FolderDetails = () => {
         .then(data => {
             if(data.success){
                 setUser(data.data);
+                setLoading(false);
             }else{
                 history.push(`/`);
             }
@@ -43,21 +48,25 @@ const FolderDetails = () => {
     return (
         <Layout
             jumboShow = {false}
-            pageTitle = {`${user.fullName}'s Folder Details`}
+            pageTitle = {`${loading?"":user.fullName+"'s"} Folder Details`}
         >
-            <UserDetailNormal label = "Client full name." value = {user.fullName} />
+            {loading?
+                <Loading variant = "page" />
+            :
+            <>
+                <UserDetailNormal label = "Client full name." value = {user.fullName} />
 
-            <UserDetailNormal label = "Client age." value = {user.age} />
+                <UserDetailNormal label = "Client age." value = {user.age} />
 
-            <UserDetailNormal label = "Client email address." value = {user.email} />
+                <UserDetailNormal label = "Client email address." value = {user.email} />
 
-            <UserDetailNormal label = "Client mobile number." value = {user.mobileNumber} />
+                <UserDetailNormal label = "Client mobile number." value = {user.mobileNumber} />
 
-            <UserDetailNormal label = "Client business name." value = {user.businessName} />
+                <UserDetailNormal label = "Client business name." value = {user.businessName} />
 
-            <UserDetailNormal label = "Client card number." value = {user.cardNumber} />
+                <UserDetailNormal label = "Client card number." value = {user.cardNumber} />
 
-            <Accordion defaultActiveKey = "pat">
+                <Accordion defaultActiveKey = "pat">
                 <UserDetailAccordion id = {user._id} label = "Primary analysis tool." value = {user.pat} eventKey = "pat" editable = {accessEditable}/>
 
                 <UserDetailAccordion id = {user._id} label = "Additional notes." value = {user.an} eventKey = "an" editable = {accessEditable}/>
@@ -72,6 +81,8 @@ const FolderDetails = () => {
 
                 <UserDetailAccordion id = {user._id} label = "Feedback/Follow up." value = {user.ffu} eventKey = "ffu" editable = {false}/>
             </Accordion>
+            </>
+            }
         </Layout>
     )
 }

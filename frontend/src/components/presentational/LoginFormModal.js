@@ -3,6 +3,7 @@ import { Modal, Nav, Button, Form } from 'react-bootstrap';
 import { FaTimes } from 'react-icons/fa';
 import NormalInputField from './NormalInputField'
 import AlertComp from '../presentational/AlertComp';
+import Loading from './Loading';
 
 const LoginFormModal = ({cookies, setUserLoggedIn, setCookie}) => {
     const [ show, setShow ] = useState(false);
@@ -10,6 +11,8 @@ const LoginFormModal = ({cookies, setUserLoggedIn, setCookie}) => {
     const [ password, setPassword ] = useState('');
     // state for alert
     const [[showAlert, setShowAlert], [alertMessage, setAlertMessage], [alertVariant, setAlertVariant]] = [useState(false), useState(""), useState("")];
+    // state for button click disabling
+    const [ buttonClicked, setButtonClicked ] = useState(false);
 
     const handleEmailChange = e => setEmail(e.target.value);
     const handlePasswordChange = e => setPassword(e.target.value);
@@ -43,6 +46,7 @@ const LoginFormModal = ({cookies, setUserLoggedIn, setCookie}) => {
 
     const handleSubmit = e => {
         e.preventDefault();
+        setButtonClicked(true);
         if(email !== "" && password !== ""){
             const admin = { email: email, password: password };
             fetch(`${process.env.REACT_APP_BACKEND_HOST}/login/`, {
@@ -62,13 +66,16 @@ const LoginFormModal = ({cookies, setUserLoggedIn, setCookie}) => {
                     setUserLoggedIn(true);
                 }else{
                     displayAlert(data.message, "danger", true);
+                    setButtonClicked(false);
                 }
             })
             .catch(err => {
                 displayAlert(`Login error, because: ${err}`, "danger", true);
+                setButtonClicked(false);
             })
         }else{
             displayAlert("Complete filling form before submitting.", "danger", true);
+            setButtonClicked(false);
         }
     }
 
@@ -105,16 +112,12 @@ const LoginFormModal = ({cookies, setUserLoggedIn, setCookie}) => {
                             controlId = "password"
                         />
                         <div className="text-center">
-                            <Button variant = "light" type = "submit" className = "secondary-bg">Login</Button>
+                            <Button variant = "light" type = "submit" className = "secondary-bg" disabled = {buttonClicked? true : false}> 
+                                {buttonClicked? <Loading variant = "button" /> : "Login" }
+                            </Button>
                         </div>
                     </Form>
                 </Modal.Body>
-                
-                {/* <Modal.Footer>
-                    <Button variant="danger" onClick={handleClose}>
-                        <FaTimes />
-                    </Button>
-                </Modal.Footer> */}
             </Modal>
         </>
     )

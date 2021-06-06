@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import NormalInputField from './NormalInputField';
 import RichTextEditorInput from './RichTextEditorInput';
 import AlertComp from './AlertComp';
+import Loading from './Loading';
 
 const CreateFolderForm = () => {
     const [ cookies ] = useCookies(['loggedInUserToken'])
@@ -14,15 +15,13 @@ const CreateFolderForm = () => {
     // States for the alert
     const [[showAlert, setShowAlert], [alertMessage, setAlertMessage], [alertVariant, setAlertVariant]] = [useState(false), useState(""), useState("")];
 
-    // state to handle client's full name
+    // state for button click disabling
+    const [ buttonClicked, setButtonClicked ] = useState(false);
+
     const [ fullname, setFullname ] = useState('');
-    // state to handle client's age
     const [ age, setAge ] = useState('');
-    // state to handle client's email address
     const [ email, setEmail ] = useState('');
-    // state to handle client's mobile number
     const [ mobileNumber, setMobileNumber ] = useState('');
-    // state to handle client's business name
     const [ businessName, setBusinessName ] = useState('');
     // state to handle client's primary analysis tool
     const [ pat, setPat ] = useState('');
@@ -88,7 +87,7 @@ const CreateFolderForm = () => {
     
     const handleSubmit = e => {
         e.preventDefault();
-
+        setButtonClicked(true);
         if(fullname !== "" && age !== "" && email !== "" && mobileNumber !== "" && businessName !== "" && pat !== "" && an !== "" && sat !== "" && mc !== "" && rsa !== "" && naa !== "" ){
             // setFfu((ffu==="")?[]:ffu);
             const newClient = { fullname, age, email, mobileNumber, businessName, pat, an, sat, mc, rsa, naa, ffu };
@@ -193,11 +192,13 @@ const CreateFolderForm = () => {
                 />
                 
                 <RichTextEditorInput 
-                    stateValue = {ffu} onStateValueChange = {onChangeFfu} title = "Feedback/follow up." formText = "" controlId = "ffu"
+                    stateValue = {ffu} onStateValueChange = {onChangeFfu} title = "Feedback/follow up (Optional)." formText = "" controlId = "ffu"
                 />
                 
                 <div className="text-center">
-                    <Button variant = "light" type = "submit" className = "secondary-bg">Create</Button>
+                    <Button variant = "light" type = "submit" className = "secondary-bg" disabled = {buttonClicked? true : false}>
+                        {buttonClicked? <Loading variant = "button" /> : "Create" }
+                    </Button>
                 </div>
             </Form>
         </div>

@@ -25,8 +25,8 @@ const ConfirmDialog = ({ buttonVariant, buttonText, handleClick, confirmMessage 
                 
                 <Modal.Footer>
                     <Button variant="success" onClick={() => {
-                        handleClick();
                         handleClose();
+                        handleClick();
                     }}>
                         Yes
                     </Button>

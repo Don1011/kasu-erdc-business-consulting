@@ -4,6 +4,7 @@ import { useCookies } from 'react-cookie';
 import { Form, Button } from 'react-bootstrap';
 import NormalInputField from '../presentational/NormalInputField';
 import AlertComp from './AlertComp';
+import Loading from '../presentational/Loading';
 
 const CreateAdminForm = () => {
     const [ cookies ] = useCookies(['loggedInUserToken'])
@@ -11,6 +12,8 @@ const CreateAdminForm = () => {
     const history = useHistory();
     // States for the alert
     const [[showAlert, setShowAlert], [alertMessage, setAlertMessage], [alertVariant, setAlertVariant]] = [useState(false), useState(""), useState("")];
+    // state for button click disabling
+    const [ buttonClicked, setButtonClicked ] = useState(false);
 
     // States for the form inputs
     const [ name, setName ] = useState('');
@@ -56,6 +59,7 @@ const CreateAdminForm = () => {
     // function to submit form
     const handleSubmit = (e) => {
         e.preventDefault()
+        setButtonClicked(true);
         if(name !== "" && email !== "" && mobileNumber !== "" && password !== "" && confirmPassword !== "" && accountStatus !== "" && bdsp !== "" ){
             if(password === confirmPassword){
                 const newAdmin = { fullname: name.trim(), email: email.trim(), mobileNumber: mobileNumber.trim(), password: password, adminStatus: accountStatus, bdsp: bdsp.trim() }
@@ -74,16 +78,20 @@ const CreateAdminForm = () => {
                         history.push(`/admin-details/${data.data._id}`)
                     }else{
                         displayAlert(data.message, "danger", true);
+                        setButtonClicked(false);
                     }
                 })
                 .catch(err => {
                     displayAlert(`Error: ${err}`, "danger", true);
+                    setButtonClicked(false);
                 })
             }else{
                 displayAlert("Passwords do not match.", "danger", true);
+                setButtonClicked(false);
             }
         }else{
             displayAlert("You have to fill all input fields before submitting.", "danger", true);
+            setButtonClicked(false);
         }
 
     }
@@ -136,7 +144,9 @@ const CreateAdminForm = () => {
             </Form.Group>
 
             <div className="text-center">
-                <Button variant = "light" type = "submit" className = "secondary-bg">Create</Button>
+                <Button variant = "light" type = "submit" className = "secondary-bg" disabled = {buttonClicked? true : false}>
+                    {buttonClicked? <Loading variant = "button" /> : "Create" }
+                </Button>
             </div>
         </Form>
 

@@ -24,7 +24,7 @@ const Home = () => {
                 </Row>
                 <Row className = "justify-content-center">                    
                     <HomepageCard
-                        imageUrl = '../../img/insurance.svg' 
+                        imageUrl = '../../img/data_security.svg' 
                         imagePosition = "left"
                         body = "Secure management of data gathered during consultation to ensure confidentiality." 
                     />

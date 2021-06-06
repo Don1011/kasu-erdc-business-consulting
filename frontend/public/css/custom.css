@@ -116,3 +116,21 @@
 .button-in-accordion{
     z-index: 2
 }
+.loading{
+    animation: loading-spin infinite 2s linear;
+}
+@keyframes loading-spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+.button-loading{
+    height: 40px
+}
+.page-loading{
+    height: 75px
+}
+  

@@ -5,6 +5,7 @@ import Layout from '../layout/Layout';
 import UserDetailNormal from '../presentational/UserDetailNormal';
 import ConfirmDialog from '../presentational/ConfirmDialog';
 import AlertComp from '../presentational/AlertComp';
+import Loading from '../presentational/Loading';
 
 const AdminDetails = () => {
     const [ cookies ] = useCookies(['loggedInUserToken'])
@@ -18,6 +19,10 @@ const AdminDetails = () => {
 
     // States for the alert
     const [[showAlert, setShowAlert], [alertMessage, setAlertMessage], [alertVariant, setAlertVariant]] = [useState(false), useState(""), useState("")];
+    // state for page loading
+    const [ loading, setLoading ] = useState(true);
+    // state for button click disabling
+    const [ buttonClicked, setButtonClicked ] = useState(false);
 
     const { id } = useParams();
 
@@ -35,6 +40,7 @@ const AdminDetails = () => {
             if(data.success){
                 setUser(data.data.admin);
                 setLoggedUser(data.data.loggedUserEmail);
+                setLoading(false);
             }else{
                 // console.log(data.message);
                 history.push(`/`);
@@ -70,6 +76,7 @@ const AdminDetails = () => {
     }
 
     const handleDelete = (id) => {
+        setButtonClicked(true);
         fetch(`${process.env.REACT_APP_BACKEND_HOST}/delete-admin/${id}`,{
             method: 'DELETE',
             headers: {
@@ -81,18 +88,18 @@ const AdminDetails = () => {
         .then(data => {
             if(data.success){
                 setDeleted(true);
-                setAlertMessage(data.message);
-                setAlertVariant("success");
-                setShowAlert(true);
+                history.push('/admin-list');
             }else{
                 setAlertMessage(data.message);
                 setAlertVariant("danger");
                 setShowAlert(true);
+                setButtonClicked(false)
             }
         }).catch(err => {
             setAlertMessage(`A delete error occurred because: ${err}`);
             setAlertVariant("danger");
             setShowAlert(true);
+            setButtonClicked(false)
         })
     }
     
@@ -107,6 +114,9 @@ const AdminDetails = () => {
                 {
                     !deleted 
                     &&
+                        loading?
+                            <Loading variant = "page" />
+                        :
                     <>
                         <UserDetailNormal
                             label = "Full name." value = {user.fullName}
@@ -126,7 +136,7 @@ const AdminDetails = () => {
                         {(loggedUser !== user.email) 
                             &&
                         <div className="text-center justify-content-center">
-                            <ConfirmDialog buttonVariant = "danger" buttonText = "Delete" handleClick = {() => handleDelete(user._id)} confirmMessage = "Are you sure you want to delete this admin?" />
+                            <ConfirmDialog buttonVariant = "danger" buttonText = {buttonClicked? <Loading variant = "button" /> : "Delete"} disabled = {buttonClicked? true : false} handleClick = {() => handleDelete(user._id)} confirmMessage = "Are you sure you want to delete this admin?" />
                         </div>
                         }  
                     </>
